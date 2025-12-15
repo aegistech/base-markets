@@ -4,7 +4,7 @@ import { Button } from './Button';
 interface StakeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onStake: (amount: number) => Promise<void>;
+  onStake: (amount: number, onStatus: (msg: string) => void) => Promise<void>;
   onRequestUnstake: (amount: number) => Promise<void>;
   onCompleteUnstake: () => Promise<void>;
   stakedBalance: number;
@@ -26,6 +26,7 @@ export const StakeModal: React.FC<StakeModalProps> = ({
 }) => {
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState("Processing...");
   const [activeTab, setActiveTab] = useState<'stake' | 'unstake'>('stake');
 
   if (!isOpen) return null;
@@ -34,10 +35,13 @@ export const StakeModal: React.FC<StakeModalProps> = ({
     const val = parseFloat(amount);
     if (!isNaN(val) && val > 0) {
       setIsLoading(true);
+      setStatus("Initializing...");
       try {
         if (activeTab === 'stake') {
-          await onStake(val);
+          await onStake(val, (msg) => setStatus(msg));
         } else {
+          // unstake usually doesn't need approve so status might be simpler
+          setStatus("Unstaking...");
           await onRequestUnstake(val);
         }
         setAmount('');
@@ -52,6 +56,7 @@ export const StakeModal: React.FC<StakeModalProps> = ({
   
   const handleFinalize = async () => {
       setIsLoading(true);
+      setStatus("Claiming...");
       try {
           await onCompleteUnstake();
           onClose();
@@ -129,7 +134,7 @@ export const StakeModal: React.FC<StakeModalProps> = ({
 
         <div className="flex gap-3 mb-6">
           <Button variant="primary" onClick={handleAction} fullWidth disabled={isInvalid || isLoading}>
-            {isLoading && !amount ? "Processing..." : `Confirm ${activeTab === 'stake' ? 'Stake' : 'Request Unstake'}`}
+            {isLoading ? status : `Confirm ${activeTab === 'stake' ? 'Stake' : 'Request Unstake'}`}
           </Button>
         </div>
 
