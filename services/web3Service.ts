@@ -110,7 +110,11 @@ export const getWalletUSDCBalance = async (signer: any, address: string): Promis
     }
 };
 
-export const depositFunds = async (amount: number, signer: any): Promise<boolean> => {
+export const depositFunds = async (
+  amount: number, 
+  signer: any, 
+  onStatus?: (status: string) => void
+): Promise<boolean> => {
   try {
     // 1. Initialize Contract Objects
     const usdcContract = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
@@ -128,12 +132,14 @@ export const depositFunds = async (amount: number, signer: any): Promise<boolean
     const amountWei = ethers.parseUnits(amount.toString(), decimals);
 
     // 4. Approve (Allow Vault to spend funds)
+    if (onStatus) onStatus("Step 1/2: Approving USDC...");
     console.log(`Approving ${amount} USDC...`);
     const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, amountWei);
     await approveTx.wait();
     console.log("Approval successful.");
 
     // 5. Call Deposit on Vault
+    if (onStatus) onStatus("Step 2/2: Depositing to Vault...");
     console.log("Depositing funds into Vault...");
     // Function name is `deposit` in your contract
     const tx = await vaultContract.deposit(amountWei);
@@ -143,6 +149,7 @@ export const depositFunds = async (amount: number, signer: any): Promise<boolean
     return true;
   } catch (error: any) {
     console.error("Deposit Error:", error);
+    if (onStatus) onStatus(`Failed: ${error.info?.error?.message || error.message?.slice(0, 50)}...`);
     
     const isSimulation = confirm(`Transaction Failed (Error: ${error.info?.error?.message || error.message}). \n\nDo you want to SIMULATE success to test the UI?`);
     if (isSimulation) {
@@ -195,7 +202,11 @@ export const getPendingUnstake = async (signer: any): Promise<{ amount: number, 
     }
 }
 
-export const stakeFunds = async (amount: number, signer: any): Promise<boolean> => {
+export const stakeFunds = async (
+  amount: number, 
+  signer: any,
+  onStatus?: (status: string) => void
+): Promise<boolean> => {
   try {
     if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
         alert("Please deploy StakingPool.sol and update STAKING_CONTRACT_ADDRESS in services/web3Service.ts");
@@ -207,10 +218,12 @@ export const stakeFunds = async (amount: number, signer: any): Promise<boolean> 
     
     const amountWei = ethers.parseUnits(amount.toString(), 6);
 
+    if (onStatus) onStatus("Step 1/2: Approving USDC...");
     console.log(`Approving ${amount} USDC for Staking...`);
     const approveTx = await usdcContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
     await approveTx.wait();
 
+    if (onStatus) onStatus("Step 2/2: Staking Funds...");
     console.log("Staking funds...");
     const tx = await stakingContract.stake(amountWei);
     await tx.wait();
@@ -219,6 +232,7 @@ export const stakeFunds = async (amount: number, signer: any): Promise<boolean> 
 
   } catch (error: any) {
     console.error("Staking Error:", error);
+    if (onStatus) onStatus("Failed");
     const isSimulation = confirm(`Transaction Failed (Error: ${error.info?.error?.message || error.message}). \n\nDo you want to SIMULATE success to test the UI?`);
     if (isSimulation) {
         await new Promise(r => setTimeout(r, 1000));
@@ -292,7 +306,13 @@ export const claimRewards = async (signer: any): Promise<boolean> => {
 
 // --- BETTING / MARKET FUNCTIONS ---
 
-export const buyShares = async (marketId: string, outcome: 'YES' | 'NO', amount: number, signer: any): Promise<boolean> => {
+export const buyShares = async (
+  marketId: string, 
+  outcome: 'YES' | 'NO', 
+  amount: number, 
+  signer: any,
+  onStatus?: (status: string) => void
+): Promise<boolean> => {
   try {
     if (MARKET_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
        console.warn("PredictionMarket contract not deployed. Simulating transaction.");
@@ -310,11 +330,13 @@ export const buyShares = async (marketId: string, outcome: 'YES' | 'NO', amount:
     const numericId = parseInt(marketId); // Assuming IDs are numbers
 
     // 1. Approve
+    if (onStatus) onStatus("Step 1/2: Approving USDC...");
     console.log(`Approving ${amount} USDC for Betting...`);
     const approveTx = await usdcContract.approve(MARKET_CONTRACT_ADDRESS, amountWei);
     await approveTx.wait();
 
     // 2. Buy Shares
+    if (onStatus) onStatus(`Step 2/2: Buying ${outcome} Shares...`);
     console.log(`Buying ${outcome} shares...`);
     // isNo is now boolean
     const tx = await marketContract.buyShares(numericId, isNo, amountWei);
@@ -325,6 +347,7 @@ export const buyShares = async (marketId: string, outcome: 'YES' | 'NO', amount:
 
   } catch (error: any) {
     console.error("Betting Error:", error);
+    if (onStatus) onStatus("Failed");
     const isSimulation = confirm(`Transaction Failed (Error: ${error.info?.error?.message || error.message}). \n\nDo you want to SIMULATE success to test the UI?`);
     if (isSimulation) {
         await new Promise(r => setTimeout(r, 1000));
