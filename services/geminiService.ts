@@ -1,7 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 
 const getClient = () => {
-  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+  // Use process.env.API_KEY as per Google GenAI SDK guidelines.
+  // Assume process.env.API_KEY is available in the environment.
   const apiKey = process.env.API_KEY;
   
   if (!apiKey) {
