@@ -296,17 +296,21 @@ const App = () => {
               {/* Markets Dashboard */}
               <Route path="/" element={
                 <div className="space-y-6">
-                  {/* Hero / Banner Area */}
-                  <div className="bg-gradient-to-r from-base-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-                    <div className="relative z-10 max-w-xl">
-                      <h1 className="text-3xl font-bold mb-2">{t.heroTitle}</h1>
-                      <p className="text-purple-100 mb-6">{t.heroDesc}</p>
-                      <Button variant="primary" className="bg-white text-base-600 hover:bg-gray-100 border-none">
+                  {/* Hero / Banner Area - Updated for better color balance */}
+                  <div className="bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden flex items-center min-h-[280px]">
+                    <div className="relative z-10 max-w-2xl">
+                      <h1 className="text-4xl font-extrabold mb-4 leading-tight tracking-tight drop-shadow-sm">{t.heroTitle}</h1>
+                      <p className="text-blue-100 text-lg mb-8 max-w-lg leading-relaxed">{t.heroDesc}</p>
+                      <Button variant="primary" className="bg-white text-blue-700 hover:bg-blue-50 border-none px-8 py-3 text-base font-bold shadow-lg shadow-blue-900/30 transform transition-all hover:-translate-y-0.5">
                         {t.startTrading}
                       </Button>
                     </div>
                     {/* Decorative background elements */}
-                    <div className="absolute right-0 top-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] opacity-20 bg-cover bg-center mask-image-linear-gradient"></div>
+                    <div className="absolute inset-0 z-0">
+                         <div className="absolute right-0 top-0 h-full w-2/3 bg-[url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] opacity-30 bg-cover bg-center" style={{ maskImage: 'linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0))', WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0))' }}></div>
+                         <div className="absolute -right-20 -bottom-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                         <div className="absolute -left-20 -top-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                    </div>
                   </div>
 
                   {/* Market Grid */}
