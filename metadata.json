@@ -1,0 +1,5 @@
+{
+  "name": "BaseMarkets",
+  "description": "A decentralized prediction market on the Base network, designed for Farcaster.",
+  "requestFramePermissions": []
+}
