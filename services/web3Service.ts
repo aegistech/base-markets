@@ -90,6 +90,26 @@ export const connectWallet = async (): Promise<Web3State | null> => {
   }
 };
 
+export const getWalletUSDCBalance = async (signer: any, address: string): Promise<number> => {
+    try {
+        const usdcContract = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+        
+        let decimals = 6;
+        try {
+            decimals = await usdcContract.decimals();
+        } catch (e) {
+            console.warn("Could not fetch decimals, defaulting to 6");
+        }
+
+        const balanceWei = await usdcContract.balanceOf(address);
+        const balance = parseFloat(ethers.formatUnits(balanceWei, decimals));
+        return balance;
+    } catch (error) {
+        console.error("Failed to fetch USDC balance", error);
+        return 0;
+    }
+};
+
 export const depositFunds = async (amount: number, signer: any): Promise<boolean> => {
   try {
     // 1. Initialize Contract Objects
