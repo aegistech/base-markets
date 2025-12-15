@@ -1,12 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 
+// Declare process for client-side usage (shimmed by Vite)
+declare var process: {
+  env: {
+    API_KEY?: string;
+    [key: string]: any;
+  }
+};
+
 const getClient = () => {
   // Use process.env.API_KEY as per Google GenAI SDK guidelines.
-  // Assume process.env.API_KEY is available in the environment.
+  // The value is injected by Vite config define plugin.
   const apiKey = process.env.API_KEY;
   
   if (!apiKey) {
-    console.warn("Gemini API Key is missing. Please set API_KEY in your environment.");
+    console.warn("Gemini API Key is missing. Please set VITE_API_KEY (mapped to API_KEY) in your environment.");
     return null;
   }
   return new GoogleGenAI({ apiKey });
