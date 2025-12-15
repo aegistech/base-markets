@@ -200,9 +200,9 @@ const App = () => {
   };
 
   // Actions
-  const handleDeposit = async (amount: number) => {
+  const handleDeposit = async (amount: number, onStatus: (msg: string) => void) => {
     if (!web3State) return;
-    const success = await depositFunds(amount, web3State.signer);
+    const success = await depositFunds(amount, web3State.signer, onStatus);
     if (success) {
       // Refresh wallet balance after deposit
       const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
@@ -220,12 +220,12 @@ const App = () => {
     }
   };
 
-  const handleTrade = async (marketId: string, outcome: MarketOutcome, amount: number) => {
+  const handleTrade = async (marketId: string, outcome: MarketOutcome, amount: number, onStatus: (msg: string) => void) => {
     if (!web3State) {
         alert("Please connect wallet first");
         return;
     }
-    const success = await buyShares(marketId, outcome, amount, web3State.signer);
+    const success = await buyShares(marketId, outcome, amount, web3State.signer, onStatus);
     if (success) {
         // Refresh wallet balance
         const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
@@ -233,9 +233,9 @@ const App = () => {
     }
   };
 
-  const handleStake = async (amount: number) => {
+  const handleStake = async (amount: number, onStatus: (msg: string) => void) => {
       if (!web3State) return;
-      const success = await stakeFunds(amount, web3State.signer);
+      const success = await stakeFunds(amount, web3State.signer, onStatus);
       if (success) {
           const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
           setBalance(usdcBalance);
