@@ -7,7 +7,7 @@ interface TradeModalProps {
   initialOutcome: MarketOutcome;
   isOpen: boolean;
   onClose: () => void;
-  onTrade: (marketId: string, outcome: MarketOutcome, amount: number) => void;
+  onTrade: (marketId: string, outcome: MarketOutcome, amount: number, onStatus: (msg: string) => void) => void;
   userBalance: number;
 }
 
@@ -21,6 +21,8 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 }) => {
   const [amount, setAmount] = useState('');
   const [outcome, setOutcome] = useState<MarketOutcome>(initialOutcome);
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState("Processing...");
 
   useEffect(() => {
     setOutcome(initialOutcome);
@@ -35,11 +37,19 @@ export const TradeModal: React.FC<TradeModalProps> = ({
   const potentialProfit = potentialReturn - (parseFloat(amount) || 0);
   const profitPercent = price > 0 ? ((1 - price) / price) * 100 : 0;
 
-  const handleTrade = () => {
+  const handleTrade = async () => {
     const val = parseFloat(amount);
     if (!isNaN(val) && val > 0 && val <= userBalance) {
-      onTrade(market.id, outcome, val);
-      onClose();
+      setIsLoading(true);
+      setStatus("Initializing...");
+      try {
+        await onTrade(market.id, outcome, val, (msg) => setStatus(msg));
+        onClose();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -85,6 +95,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
               onChange={(e) => setAmount(e.target.value)}
               className="w-full bg-dark-900 border border-dark-700 rounded-lg pl-8 pr-4 py-3 text-white focus:border-base-500 focus:outline-none text-lg font-mono"
               placeholder="0.00"
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -109,9 +120,9 @@ export const TradeModal: React.FC<TradeModalProps> = ({
           variant={outcome === MarketOutcome.YES ? 'success' : 'danger'} 
           onClick={handleTrade} 
           fullWidth
-          disabled={isInvalid}
+          disabled={isInvalid || isLoading}
         >
-          {isInvalid && parseFloat(amount) > userBalance ? "Insufficient Balance" : `Confirm Buy ${outcome}`}
+          {isLoading ? status : (isInvalid && parseFloat(amount) > userBalance ? "Insufficient Balance" : `Confirm Buy ${outcome}`)}
         </Button>
       </div>
     </div>
