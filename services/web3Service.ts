@@ -308,7 +308,7 @@ export const claimRewards = async (signer: any): Promise<boolean> => {
 
 export const buyShares = async (
   marketId: string, 
-  outcome: 'YES' | 'NO', 
+  outcome: string, // Changed from 'YES' | 'NO' to string to avoid Enum strict type issues in build
   amount: number, 
   signer: any,
   onStatus?: (status: string) => void
