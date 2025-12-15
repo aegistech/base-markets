@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Market, MarketOutcome, UserProfile } from './types';
-import { INITIAL_MARKETS, MOCK_USER, MOCK_NEWS, LEADERBOARD_DATA } from './constants';
+import { INITIAL_MARKETS, MOCK_USER, MOCK_NEWS, LEADERBOARD_DATA, TRANSLATIONS } from './constants';
 import { MarketCard } from './components/MarketCard';
 import { TradeModal } from './components/TradeModal';
 import { DepositModal } from './components/DepositModal';
@@ -13,7 +13,7 @@ import { NewsFeed } from './components/NewsFeed';
 import { LegalFooter } from './components/LegalFooter';
 import { CryptoTicker } from './components/CryptoTicker';
 import { Sidebar } from './components/Sidebar';
-import { connectWallet, depositFunds, withdrawFunds, stakeFunds, requestUnstakeFunds, completeUnstakeFunds, buyShares, getPendingUnstake, Web3State } from './services/web3Service';
+import { connectWallet, depositFunds, withdrawFunds, stakeFunds, requestUnstakeFunds, completeUnstakeFunds, buyShares, getPendingUnstake, getWalletUSDCBalance, Web3State } from './services/web3Service';
 
 // Mock Farcaster Icon
 const FarcasterIcon = () => (
@@ -43,7 +43,9 @@ const Header = ({
   points,
   isConnecting,
   isDarkMode,
-  toggleTheme
+  toggleTheme,
+  lang,
+  setLang
 }: { 
   user: UserProfile | null, 
   onLogin: () => void, 
@@ -53,8 +55,12 @@ const Header = ({
   points: number,
   isConnecting: boolean,
   isDarkMode: boolean,
-  toggleTheme: () => void
+  toggleTheme: () => void,
+  lang: 'en' | 'zh',
+  setLang: (l: 'en' | 'zh') => void
 }) => {
+  const t = TRANSLATIONS[lang];
+
   return (
     <header className="border-b border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-900 sticky top-0 z-40 transition-colors duration-300">
       <div className="w-full px-4 h-16 flex items-center justify-between">
@@ -68,7 +74,7 @@ const Header = ({
           <div className="hidden md:flex relative ml-4">
              <input 
                type="text" 
-               placeholder="Tìm kiếm thị trường..." 
+               placeholder={t.searchPlaceholder}
                className="bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-sm rounded-full pl-10 pr-4 py-2 text-gray-800 dark:text-gray-300 w-64 focus:outline-none focus:border-base-500 focus:ring-1 focus:ring-base-500 transition-colors"
              />
              <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,6 +84,23 @@ const Header = ({
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Language Selector */}
+          <div className="relative">
+            <select 
+              value={lang}
+              onChange={(e) => setLang(e.target.value as 'en' | 'zh')}
+              className="appearance-none bg-gray-100 dark:bg-dark-800 text-gray-700 dark:text-gray-300 text-xs font-medium py-1.5 pl-3 pr-8 rounded-lg focus:outline-none border border-transparent focus:border-base-500 cursor-pointer"
+            >
+              <option value="en">🇺🇸 English</option>
+              <option value="zh">🇨🇳 中文</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
           <button 
             onClick={toggleTheme}
             className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg transition-colors"
@@ -89,7 +112,7 @@ const Header = ({
           {user ? (
             <div className="flex items-center gap-4">
                <div className="hidden sm:flex flex-col items-end mr-2">
-                 <span className="text-xs text-gray-500 dark:text-gray-400">Balance</span>
+                 <span className="text-xs text-gray-500 dark:text-gray-400">{t.balance}</span>
                  <span className="text-sm font-mono font-bold text-gray-900 dark:text-white">${balance.toFixed(2)}</span>
                </div>
                
@@ -110,7 +133,7 @@ const Header = ({
             </div>
           ) : (
             <Button variant="farcaster" onClick={onLogin} disabled={isConnecting}>
-              {isConnecting ? "Connecting..." : <><FarcasterIcon /> Sign in with Farcaster</>}
+              {isConnecting ? t.connecting : <><FarcasterIcon /> {t.signIn}</>}
             </Button>
           )}
         </div>
@@ -121,6 +144,7 @@ const Header = ({
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [lang, setLang] = useState<'en' | 'zh'>('en'); // Language State
   const [user, setUser] = useState<UserProfile | null>(null);
   const [markets, setMarkets] = useState<Market[]>(INITIAL_MARKETS);
   const [balance, setBalance] = useState(0);
@@ -138,6 +162,8 @@ const App = () => {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showStake, setShowStake] = useState(false);
   const [tradeModalData, setTradeModalData] = useState<{market: Market, outcome: MarketOutcome} | null>(null);
+
+  const t = TRANSLATIONS[lang]; // Current translations
 
   // Theme Toggle
   useEffect(() => {
@@ -161,8 +187,10 @@ const App = () => {
         ...MOCK_USER,
         walletAddress: state.address
       });
-      // In a real app, you'd fetch balance from contract here
-      setBalance(1000); // Demo balance
+      
+      // FETCH REAL BALANCE FROM WALLET (USDC)
+      const usdcBalance = await getWalletUSDCBalance(state.signer, state.address);
+      setBalance(usdcBalance);
       
       // Fetch Staking Info
       const pending = await getPendingUnstake(state.signer);
@@ -176,7 +204,9 @@ const App = () => {
     if (!web3State) return;
     const success = await depositFunds(amount, web3State.signer);
     if (success) {
-      setBalance(prev => prev + amount); // Optimistic update
+      // Refresh wallet balance after deposit
+      const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
+      setBalance(usdcBalance); 
     }
   };
 
@@ -184,7 +214,9 @@ const App = () => {
     if (!web3State) return;
     const success = await withdrawFunds(amount, web3State.signer);
     if (success) {
-      setBalance(prev => prev - amount);
+      // Refresh wallet balance after withdraw
+      const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
+      setBalance(usdcBalance);
     }
   };
 
@@ -195,8 +227,9 @@ const App = () => {
     }
     const success = await buyShares(marketId, outcome, amount, web3State.signer);
     if (success) {
-        setBalance(prev => prev - amount);
-        // In real app, update market volume/prices
+        // Refresh wallet balance
+        const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
+        setBalance(usdcBalance);
     }
   };
 
@@ -204,7 +237,8 @@ const App = () => {
       if (!web3State) return;
       const success = await stakeFunds(amount, web3State.signer);
       if (success) {
-          setBalance(prev => prev - amount);
+          const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
+          setBalance(usdcBalance);
           setStakedBalance(prev => prev + amount);
       }
   };
@@ -224,7 +258,9 @@ const App = () => {
       if (!web3State) return;
       const success = await completeUnstakeFunds(web3State.signer);
       if (success) {
-          setBalance(prev => prev + pendingUnstake.amount);
+          // Funds return to wallet, update balance
+          const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
+          setBalance(usdcBalance);
           setPendingUnstake({ amount: 0, unlockTime: 0 });
       }
   };
@@ -244,12 +280,15 @@ const App = () => {
           isConnecting={isConnecting}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
+          lang={lang}
+          setLang={setLang}
         />
 
         <div className="flex flex-1 max-w-7xl w-full mx-auto">
           <Sidebar 
              onDeposit={() => setShowDeposit(true)}
              onWithdraw={() => setShowWithdraw(true)}
+             lang={lang}
           />
 
           <main className="flex-1 p-4 md:p-6 min-w-0 overflow-y-auto">
@@ -260,10 +299,10 @@ const App = () => {
                   {/* Hero / Banner Area */}
                   <div className="bg-gradient-to-r from-base-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
                     <div className="relative z-10 max-w-xl">
-                      <h1 className="text-3xl font-bold mb-2">Predict the Future. Win Rewards.</h1>
-                      <p className="text-purple-100 mb-6">Trade on the outcome of real-world events using USDC on Base. Low fees, instant settlements.</p>
+                      <h1 className="text-3xl font-bold mb-2">{t.heroTitle}</h1>
+                      <p className="text-purple-100 mb-6">{t.heroDesc}</p>
                       <Button variant="primary" className="bg-white text-base-600 hover:bg-gray-100 border-none">
-                        Start Trading
+                        {t.startTrading}
                       </Button>
                     </div>
                     {/* Decorative background elements */}
@@ -273,12 +312,12 @@ const App = () => {
                   {/* Market Grid */}
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">Trending Markets</h2>
+                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t.trendingMarkets}</h2>
                        <div className="flex gap-2">
                          <select className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:border-base-500">
-                           <option>Top Volume</option>
-                           <option>Newest</option>
-                           <option>Ending Soon</option>
+                           <option>{t.topVolume}</option>
+                           <option>{t.newest}</option>
+                           <option>{t.endingSoon}</option>
                          </select>
                        </div>
                     </div>
@@ -289,6 +328,7 @@ const App = () => {
                           key={market.id} 
                           market={market} 
                           onTrade={(m, o) => setTradeModalData({ market: m, outcome: o })}
+                          lang={lang}
                         />
                       ))}
                     </div>
@@ -299,15 +339,15 @@ const App = () => {
               {/* Leaderboard Route */}
               <Route path="/leaderboard" element={
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Leaderboard</h2>
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{t.leaderboard}</h2>
                   <div className="bg-white dark:bg-dark-800 rounded-xl border border-gray-200 dark:border-dark-700 overflow-hidden">
                     <table className="w-full text-left">
                       <thead className="bg-gray-50 dark:bg-dark-900 border-b border-gray-200 dark:border-dark-700">
                         <tr>
-                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rank</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">PnL</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Win Rate</th>
+                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.rank}</th>
+                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.user}</th>
+                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">{t.pnl}</th>
+                          <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">{t.winRate}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
@@ -340,24 +380,24 @@ const App = () => {
                    <div className="inline-block p-4 rounded-full bg-base-500/10 mb-4">
                      <span className="text-4xl">🏦</span>
                    </div>
-                   <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Earn Yield on USDC</h2>
+                   <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">{t.earnYield}</h2>
                    <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                     Provide liquidity to the prediction markets and earn a share of trading fees. Current APY: <span className="text-green-500 font-bold">12.5%</span>
+                     {t.provideLiquidity} <span className="text-green-500 font-bold">12.5%</span>
                    </p>
                    
                    <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8">
                      <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-gray-200 dark:border-dark-700">
-                        <div className="text-xs text-gray-500 mb-1">Your Staked Balance</div>
+                        <div className="text-xs text-gray-500 mb-1">{t.yourStaked}</div>
                         <div className="text-2xl font-bold font-mono">${stakedBalance.toFixed(2)}</div>
                      </div>
                      <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-gray-200 dark:border-dark-700">
-                        <div className="text-xs text-gray-500 mb-1">Pending Unstake</div>
+                        <div className="text-xs text-gray-500 mb-1">{t.pendingUnstake}</div>
                         <div className="text-2xl font-bold font-mono">${pendingUnstake.amount.toFixed(2)}</div>
                      </div>
                    </div>
 
                    <Button size="lg" onClick={() => setShowStake(true)}>
-                     Manage Stake
+                     {t.manageStake}
                    </Button>
                  </div>
               } />
@@ -370,7 +410,7 @@ const App = () => {
               } />
               
               {/* Other Routes Placeholders */}
-              <Route path="*" element={<div className="p-12 text-center text-gray-500">Coming Soon</div>} />
+              <Route path="*" element={<div className="p-12 text-center text-gray-500">{t.comingSoon}</div>} />
 
             </Routes>
           </main>
