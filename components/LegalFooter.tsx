@@ -35,7 +35,7 @@ export const LegalFooter = () => {
         </div>
         
         <div className="pt-8 border-t border-gray-200 dark:border-dark-700 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-400">
-          <p>© 2024 BaseMarkets. All rights reserved.</p>
+          <p>© 2025 BaseMarkets. All rights reserved.</p>
           <p className="mt-2 md:mt-0">
             BaseMarkets is a non-custodial interface. 
             Users are responsible for their own keys and compliance with local laws.
