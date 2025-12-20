@@ -6,10 +6,10 @@
     <title>BaseMarkets | Decentralized Prediction Market</title>
 
     <!-- Farcaster Mini App Embed (current standard as of 2025) -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://base-markets.vercel.app/og-image.png","button":{"title":"Launch App","action":{"type":"launch_frame","name":"BaseMarkets","url":"https://base-markets.vercel.app/","splashImageUrl":"https://base-markets.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://base-markets.vercel.app/og-image.png","button":{"title":"Launch App","action":{"type":"launch_miniapp","name":"BaseMarkets","url":"https://base-markets.vercel.app/","splashImageUrl":"https://base-markets.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
 
     <!-- Backward compatibility with older clients -->
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://base-markets.vercel.app/og-image.png","button":{"title":"Launch App","action":{"type":"launch_frame","name":"BaseMarkets","url":"https://base-markets.vercel.app/","splashImageUrl":"https://base-markets.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
+    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://base-markets.vercel.app/og-image.png","button":{"title":"Launch App","action":{"type":"launch_miniapp","name":"BaseMarkets","url":"https://base-markets.vercel.app/","splashImageUrl":"https://base-markets.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230052ff' /%3E%3Cpath d='M25 65 L 45 45 L 55 55 L 75 30' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
@@ -22,6 +22,5 @@
     <div id="root"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk/dist/index.min.js"></script>
-    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
