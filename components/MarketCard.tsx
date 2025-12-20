@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Market, MarketOutcome } from '../types';
+import { Market, MarketOutcome, Language } from '../types';
 import { Button } from './Button';
 import { getMarketAnalysis } from '../services/geminiService';
 import { TRANSLATIONS } from '../constants';
@@ -7,13 +8,13 @@ import { TRANSLATIONS } from '../constants';
 interface MarketCardProps {
   market: Market;
   onTrade: (market: Market, outcome: MarketOutcome) => void;
-  lang: 'en' | 'vi';
+  lang: Language;
 }
 
 export const MarketCard: React.FC<MarketCardProps> = ({ market, onTrade, lang }) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
-  const t = TRANSLATIONS[lang as keyof typeof TRANSLATIONS] || TRANSLATIONS.en;
+  const t = TRANSLATIONS.en;
 
   const fetchAnalysis = async () => {
     if (analysis) return;
