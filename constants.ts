@@ -1,3 +1,4 @@
+
 import { Market, NewsItem, MarketOutcome } from './types';
 
 export const TRANSLATIONS = {
@@ -15,7 +16,7 @@ export const TRANSLATIONS = {
     points: "Points",
     news: "News",
     myWallet: "My Wallet",
-    heroTitle: "Predict the Future. Win USDC.",
+    heroTitle: "Predict the Future. Win Rewards.",
     heroDesc: "The most liquid prediction market on Base. Fast, secure, and decentralized.",
     startTrading: "Start Trading",
     trendingMarkets: "Trending Markets",
@@ -62,8 +63,8 @@ export const INITIAL_MARKETS: Market[] = [
   },
   {
     id: '3',
-    question: "Will the Fed announce a rate cut in June 2025?",
-    description: "Resolves YES if there is any cut in the June FOMC meeting.",
+    question: "Will the Fed cut interest rates in Q2 2025?",
+    description: "Resolves YES if there is any cut announced in the June meeting.",
     endDate: "2025-06-30",
     volume: 890000,
     yesPrice: 0.75,
@@ -76,33 +77,23 @@ export const INITIAL_MARKETS: Market[] = [
 
 export const MOCK_USER = {
   fid: 888,
-  username: "vuminh_degen",
+  username: "base_trader",
   pfpUrl: "https://picsum.photos/100/100?random=99",
   walletAddress: "0xFC...1225",
   points: 2500
 };
+
+export const LEADERBOARD_DATA = [
+  { rank: 1, user: "vitalik.eth", pnl: 450000, winRate: 82 },
+  { rank: 2, user: "base_whale", pnl: 280200, winRate: 75 },
+  { rank: 3, user: "degen_king", pnl: 145000, winRate: 68 },
+  { rank: 4, user: "prediction_god", pnl: 92100, winRate: 62 },
+  { rank: 5, user: "early_adopter", pnl: 48000, winRate: 58 },
+];
 
 export const COIN_PRICES = [
   { symbol: "BTC", price: 98120.50, change: 1.2 },
   { symbol: "ETH", price: 2745.80, change: -0.8 },
   { symbol: "SOL", price: 242.15, change: 2.4 },
   { symbol: "USDC", price: 1.00, change: 0.00 },
-];
-
-export const LEADERBOARD_DATA = [
-  { rank: 1, user: "vitalik.eth", pnl: 450000, winRate: 82 },
-  { rank: 2, user: "base_whale", pnl: 280200, winRate: 75 },
-  { rank: 3, user: "degen_king", pnl: 145000, winRate: 68 },
-  { rank: 4, user: "farcaster_fan", pnl: 92100, winRate: 62 },
-  { rank: 5, user: "early_adopter", pnl: 48000, winRate: 58 },
-];
-
-export const MOCK_NEWS: NewsItem[] = [
-  {
-    id: '1',
-    title: "Ethereum L2 adoption spikes on Base",
-    source: "Bloomberg",
-    timeAgo: "1h ago",
-    sentiment: 'bullish'
-  }
 ];
