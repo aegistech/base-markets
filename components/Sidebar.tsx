@@ -24,11 +24,11 @@ const NavItem = ({ to, label, icon }: { to: string, label: string, icon: React.R
 interface SidebarProps {
     onDeposit?: () => void;
     onWithdraw?: () => void;
-    lang: 'en' | 'zh';
+    lang: 'en' | 'vi';
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onDeposit, onWithdraw, lang }) => {
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS[lang as keyof typeof TRANSLATIONS] || TRANSLATIONS.en;
 
   return (
     <div className="w-64 flex-shrink-0 hidden lg:block border-r border-dark-700 bg-dark-900 p-4 min-h-[calc(100vh-8rem)]">
@@ -53,13 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onDeposit, onWithdraw, lang })
           label={t.portfolio} 
           icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>} 
         />
-        <NavItem 
-          to="/points" 
-          label={t.points} 
-          icon={<svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>} 
-        />
         
-        {/* Funds Management Section */}
         <div className="pt-4 mt-4 border-t border-dark-700">
             <h3 className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{t.myWallet}</h3>
             <button 
@@ -76,14 +70,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onDeposit, onWithdraw, lang })
                 <span className="text-lg">🏦</span>
                 <span>{t.withdraw}</span>
             </button>
-        </div>
-
-        <div className="pt-4 mt-4 border-t border-dark-700">
-           <NavItem 
-            to="/news" 
-            label={t.news} 
-            icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>} 
-          />
         </div>
       </div>
     </div>
