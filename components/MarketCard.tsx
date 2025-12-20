@@ -13,37 +13,46 @@ interface MarketCardProps {
 export const MarketCard: React.FC<MarketCardProps> = ({ market, onTrade, lang }) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
-  const t = TRANSLATIONS.en;
+
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const fetchAnalysis = async () => {
-    if (analysis) return;
+    if (analysis || loadingAnalysis) return;
+
     setLoadingAnalysis(true);
-    const result = await getMarketAnalysis(market.question, market.yesPrice);
-    setAnalysis(result);
-    setLoadingAnalysis(false);
+    try {
+      const result = await getMarketAnalysis(market.question, market.yesPrice);
+      setAnalysis(result || "No insight available.");
+    } catch (error) {
+      console.error("Gemini analysis failed:", error);
+      setAnalysis("Failed to load AI insight.");
+    } finally {
+      setLoadingAnalysis(false);
+    }
   };
 
   const yesPercent = Math.round(market.yesPrice * 100);
-  const noPercent = Math.round(market.noPrice * 100);
+  const noPrice = market.noPrice ?? (1 - market.yesPrice);
+  const noPercent = Math.round(noPrice * 100);
 
   return (
     <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-xl overflow-hidden hover:border-base-500 transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col h-full group">
       <div className="flex p-4 gap-4">
         <div className="relative flex-shrink-0">
-            <img 
-            src={market.imageUrl} 
-            alt="Market" 
+          <img
+            src={market.imageUrl}
+            alt={market.question}
             className="w-16 h-16 rounded-lg object-cover bg-gray-100 dark:bg-dark-700"
-            />
+          />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-2 group-hover:text-base-500">
-              {market.question}
+          <h3 className="font-semibold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-2 group-hover:text-base-500 transition-colors">
+            {market.question}
           </h3>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>{t.vol}: ${market.volume.toLocaleString()}</span>
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex-shrink-0">{t.vol}: ${market.volume.toLocaleString()}</span>
             <span>•</span>
-            <span className="text-red-500 font-medium">{t.ends} {market.endDate}</span>
+            <span className="text-red-500 font-medium truncate">{t.ends} {market.endDate}</span>
           </div>
         </div>
       </div>
@@ -51,39 +60,45 @@ export const MarketCard: React.FC<MarketCardProps> = ({ market, onTrade, lang })
       <div className="px-4 pb-4 mt-auto space-y-3">
         {analysis ? (
           <div className="bg-gray-50 dark:bg-dark-900/50 p-3 rounded-lg text-[11px] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-dark-700">
-            <span className="text-purple-500 font-bold uppercase tracking-widest text-[9px] block mb-1">{t.aiInsight}:</span> {analysis}
+            <span className="text-purple-500 font-bold uppercase tracking-widest text-[9px] block mb-1">
+              {t.aiInsight}:
+            </span>
+            {analysis}
           </div>
         ) : (
-          <button 
-            onClick={(e) => { e.stopPropagation(); fetchAnalysis(); }}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              fetchAnalysis();
+            }}
             disabled={loadingAnalysis}
-            className="text-xs text-purple-500 hover:text-purple-400 flex items-center gap-1 font-bold"
+            className="text-xs text-purple-500 hover:text-purple-400 flex items-center gap-1 font-bold disabled:opacity-50"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813a3.75 3.75 0 002.576-2.576l.813-2.846A.75.75 0 019 4.5zM6.375 9.875c.62 0 1.205-.125 1.734-.348a5.25 5.25 0 003.543-3.543 5.23 5.23 0 01.348-1.734 5.23 5.23 0 01.348 1.734 5.25 5.25 0 003.543 3.543c.529.223 1.114.348 1.734.348.62 0 1.205.125 1.734.348a5.25 5.25 0 003.543 3.543c.529.223 1.114.348 1.734.348.62 0 1.205.125 1.734.348a5.25 5.25 0 003.543 3.543 5.23 5.23 0 01.348 1.734 5.23 5.23 0 01-.348 1.734 5.25 5.25 0 00-3.543 3.543c-.529.223-1.114.348-1.734.348-.62 0-1.205-.125-1.734-.348a5.25 5.25 0 00-3.543-3.543A5.23 5.23 0 019.875 14.125a5.23 5.23 0 01-.348-1.734A5.25 5.25 0 005.984 8.848 5.23 5.23 0 016.375 9.875z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813a3.75 3.75 0 002.576-2.576l.813-2.846A.75.75 0 019 4.5z" clipRule="evenodd" />
             </svg>
             {loadingAnalysis ? t.analyzing : t.askGemini}
           </button>
         )}
 
         <div className="grid grid-cols-2 gap-2">
-          <Button 
-            variant="success" 
-            size="sm" 
+          <Button
+            variant="success"
+            size="sm"
             onClick={() => onTrade(market, MarketOutcome.YES)}
             className="flex flex-col items-center py-2 h-auto"
           >
-            <span className="font-bold">YES {yesPercent}%</span>
+            <span className="font-bold uppercase tracking-tighter">YES {yesPercent}%</span>
             <span className="text-[10px] opacity-80">${market.yesPrice.toFixed(2)}</span>
           </Button>
-          <Button 
-            variant="danger" 
-            size="sm" 
+          <Button
+            variant="danger"
+            size="sm"
             onClick={() => onTrade(market, MarketOutcome.NO)}
             className="flex flex-col items-center py-2 h-auto"
           >
-            <span className="font-bold">NO {noPercent}%</span>
-            <span className="text-[10px] opacity-80">${market.noPrice.toFixed(2)}</span>
+            <span className="font-bold uppercase tracking-tighter">NO {noPercent}%</span>
+            <span className="text-[10px] opacity-80">${noPrice.toFixed(2)}</span>
           </Button>
         </div>
       </div>
