@@ -1,10 +1,9 @@
-
 export enum MarketOutcome {
   YES = 'YES',
   NO = 'NO'
 }
 
-export type Language = 'en';
+export type Language = 'en' | 'vi';
 
 export interface Market {
   id: string;
@@ -13,7 +12,7 @@ export interface Market {
   endDate: string;
   volume: number;
   yesPrice: number;
-  noPrice: number;
+  noPrice?: number; // Optional để linh hoạt
   imageUrl: string;
   category: 'Crypto' | 'Politics' | 'Sports' | 'Pop Culture';
   isResolved: boolean;
