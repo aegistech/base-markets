@@ -10,10 +10,7 @@ export const TRANSLATIONS = {
     connecting: "Connecting...",
     markets: "Markets",
     leaderboard: "Leaderboard",
-    earn: "Earn",
     portfolio: "Portfolio",
-    points: "Points",
-    news: "News",
     myWallet: "My Wallet",
     heroTitle: "Predict the Future. Win USDC.",
     heroDesc: "The premier decentralized prediction market on Base. Fast, secure, and liquid.",
@@ -24,42 +21,61 @@ export const TRANSLATIONS = {
     aiInsight: "AI Insight",
     askGemini: "Ask AI Analyst",
     analyzing: "Analyzing...",
-    buy: "Buy",
-    stakingApy: "12.5% APY",
-    poolTvl: "Global Pool TVL",
-    yourStake: "Your Active Stake",
-    accumulatedRewards: "Unclaimed Rewards",
-    manageStaking: "Manage Staking",
-    claimRewards: "Claim Rewards",
-    stakingStatus: "Live Yield Pool"
+    buy: "Buy"
+  },
+  vi: {
+    searchPlaceholder: "Tìm kiếm thị trường...",
+    balance: "Số dư",
+    deposit: "Nạp tiền",
+    withdraw: "Rút tiền",
+    signIn: "Đăng nhập",
+    connecting: "Đang kết nối...",
+    markets: "Thị trường",
+    leaderboard: "Bảng xếp hạng",
+    portfolio: "Danh mục",
+    myWallet: "Ví của tôi",
+    heroTitle: "Dự đoán tương lai. Nhận USDC.",
+    heroDesc: "Thị trường dự đoán phi tập trung hàng đầu trên Base. Nhanh chóng, an toàn và thanh khoản cao.",
+    startTrading: "Bắt đầu giao dịch",
+    trendingMarkets: "Thị trường nổi bật",
+    vol: "Khối lượng",
+    ends: "Kết thúc",
+    aiInsight: "Phân tích AI",
+    askGemini: "Hỏi AI Analyst",
+    analyzing: "Đang phân tích...",
+    buy: "Mua"
   }
 };
 
 export const INITIAL_MARKETS: Market[] = [
   {
     id: '1',
-    question: "Will Bitcoin hit $120k before Q3 2025?",
-    description: "Resolves to YES if BTC/USD touches $120,000 on Coinbase.",
+    question: "BTC to reach $120k before Q3 2025?",
+    description: "Resolves to YES if BTC hits $120,000 on Coinbase.",
     endDate: "2025-07-01",
     volume: 3240000,
     yesPrice: 0.65,
-    noPrice: 0.35,
     imageUrl: "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
     category: 'Crypto',
     isResolved: false
   },
   {
     id: '2',
-    question: "Will Base reach $20B TVL by year end?",
-    description: "Resolves based on L2Beat metrics for Dec 31, 2025.",
+    question: "Base to reach $20B TVL by year end?",
+    description: "Based on L2Beat data on 2025-12-31.",
     endDate: "2025-12-31",
     volume: 1250000,
     yesPrice: 0.48,
-    noPrice: 0.52,
     imageUrl: "https://avatars.githubusercontent.com/u/108554348?s=200&v=4",
     category: 'Crypto',
     isResolved: false
   }
+];
+
+export const LEADERBOARD_DATA = [
+  { rank: 1, user: "vitalik.eth", pnl: 450000 },
+  { rank: 2, user: "base_whale", pnl: 280200 },
+  { rank: 3, user: "degen_king", pnl: 145000 },
 ];
 
 export const MOCK_USER = {
@@ -69,12 +85,6 @@ export const MOCK_USER = {
   walletAddress: "0xFC...1225",
   points: 2500
 };
-
-export const LEADERBOARD_DATA = [
-  { rank: 1, user: "vitalik.eth", pnl: 450000, winRate: 82 },
-  { rank: 2, user: "base_whale", pnl: 280200, winRate: 75 },
-  { rank: 3, user: "degen_king", pnl: 145000, winRate: 68 },
-];
 
 export const COIN_PRICES = [
   { symbol: "BTC", price: 98120.50, change: 1.2 },
