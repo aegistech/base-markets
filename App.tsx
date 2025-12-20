@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Market, MarketOutcome, UserProfile, Language } from './types';
 import { INITIAL_MARKETS, MOCK_USER, LEADERBOARD_DATA, TRANSLATIONS } from './constants';
@@ -24,10 +24,10 @@ import {
 const LeaderboardPage = ({ lang }: { lang: Language }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-black text-white">{t.leaderboard}</h1>
-        <p className="text-gray-400">Top predictors on the Base ecosystem.</p>
+        <p className="text-gray-400">Top predictors on Base.</p>
       </div>
       <div className="bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden shadow-xl">
         <table className="w-full text-left">
@@ -35,7 +35,7 @@ const LeaderboardPage = ({ lang }: { lang: Language }) => {
             <tr>
               <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Rank</th>
               <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">User</th>
-              <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Profit (USDC)</th>
+              <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Profit</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-dark-700 font-bold">
@@ -54,7 +54,6 @@ const LeaderboardPage = ({ lang }: { lang: Language }) => {
 };
 
 const App = () => {
-  // Set default language to English
   const [lang, setLang] = useState<Language>('en'); 
   const [user, setUser] = useState<UserProfile | null>(null);
   const [balance, setBalance] = useState(0);
@@ -120,14 +119,14 @@ const App = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-dark-900 text-white flex flex-col font-sans">
+      <div className="min-h-screen bg-dark-900 text-white flex flex-col font-sans overflow-x-hidden">
         <Snowfall />
         <CryptoTicker />
         
         <header className="border-b border-dark-700 bg-dark-900/80 backdrop-blur-md sticky top-0 z-40 h-16">
           <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 group">
-              <Logo className="w-8 h-8 group-hover:scale-110 transition-transform" />
+            <Link to="/" className="flex items-center gap-2">
+              <Logo className="w-8 h-8" />
               <span className="font-black text-xl tracking-tighter">BASEMARKETS</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -135,7 +134,7 @@ const App = () => {
                 {lang}
               </button>
               {user ? (
-                <div className="flex items-center gap-3 bg-dark-800 px-3 py-1.5 rounded-full border border-dark-700">
+                <div className="flex items-center gap-2 bg-dark-800 px-3 py-1.5 rounded-full border border-dark-700">
                   <span className="text-xs font-black text-base-400 font-mono">${balance.toFixed(2)}</span>
                   <button className="h-6 w-6 bg-base-500 hover:bg-base-600 text-white rounded-full flex items-center justify-center font-bold text-sm" onClick={() => setShowDeposit(true)}>+</button>
                   <img src={user.pfpUrl} alt="User" className="w-6 h-6 rounded-full border border-white/20" />
@@ -155,19 +154,19 @@ const App = () => {
             onWithdraw={async () => (await ensureLogin()) && setShowWithdraw(true)} 
             lang={lang} 
           />
-          <main className="flex-1 p-4 md:p-8 min-w-0 overflow-y-auto">
+          <main className="flex-1 p-4 md:p-8 min-w-0">
             <Routes>
               <Route path="/" element={
                 <div className="space-y-12">
-                  <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-base-600 to-black p-8 md:p-14 border border-white/10 shadow-2xl">
+                  <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-base-600 to-black p-8 border border-white/10 shadow-2xl">
                     <div className="relative z-20 max-w-xl">
-                      <h1 className="text-4xl md:text-6xl font-black mb-6 leading-[1.1] tracking-tight">{t.heroTitle}</h1>
-                      <p className="text-white/70 text-lg mb-10 font-medium">{t.heroDesc}</p>
-                      <Button variant="primary" size="lg" className="!bg-white !text-base-600 font-black px-12 shadow-2xl hover:scale-105 transition-transform">{t.startTrading}</Button>
+                      <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">{t.heroTitle}</h1>
+                      <p className="text-white/70 text-lg mb-8">{t.heroDesc}</p>
+                      <Button variant="primary" size="lg" className="!bg-white !text-base-600 font-black">{t.startTrading}</Button>
                     </div>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-white mb-8 flex items-center gap-3">
+                    <h2 className="text-2xl font-black mb-8 flex items-center gap-3">
                       <span className="w-1.5 h-8 bg-base-500 rounded-full"></span>
                       {t.trendingMarkets}
                     </h2>
@@ -180,7 +179,7 @@ const App = () => {
                 </div>
               } />
               <Route path="/leaderboard" element={<LeaderboardPage lang={lang} />} />
-              <Route path="/portfolio" element={<div className="p-12 text-center text-gray-500 font-bold italic">Portfolio coming soon...</div>} />
+              <Route path="/portfolio" element={<div className="p-12 text-center text-gray-500 italic font-bold">Portfolio coming soon...</div>} />
             </Routes>
           </main>
         </div>
