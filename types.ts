@@ -1,7 +1,10 @@
+
 export enum MarketOutcome {
   YES = 'YES',
   NO = 'NO'
 }
+
+export type Language = 'en';
 
 export interface Market {
   id: string;
@@ -9,35 +12,20 @@ export interface Market {
   description: string;
   endDate: string;
   volume: number;
-  yesPrice: number; // 0.00 to 1.00
-  noPrice: number;  // 0.00 to 1.00
+  yesPrice: number;
+  noPrice: number;
   imageUrl: string;
   category: 'Crypto' | 'Politics' | 'Sports' | 'Pop Culture';
   isResolved: boolean;
   winner?: MarketOutcome;
 }
 
-export interface UserPosition {
-  marketId: string;
-  outcome: MarketOutcome;
-  shares: number;
-  avgPrice: number;
-}
-
 export interface UserProfile {
-  fid: number; // Farcaster ID
+  fid: number;
   username: string;
   pfpUrl: string;
   walletAddress: string;
   points: number;
-}
-
-export interface Transaction {
-  id: string;
-  type: 'DEPOSIT' | 'WITHDRAW' | 'BUY_YES' | 'BUY_NO' | 'SELL';
-  amount: number;
-  timestamp: number;
-  details: string;
 }
 
 export interface NewsItem {
