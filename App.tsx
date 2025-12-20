@@ -1,237 +1,194 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Market, MarketOutcome, UserProfile } from './types';
-import { INITIAL_MARKETS, MOCK_USER, MOCK_NEWS, LEADERBOARD_DATA, TRANSLATIONS } from './constants';
+import { Market, MarketOutcome, UserProfile, Language } from './types';
+import { INITIAL_MARKETS, MOCK_USER, LEADERBOARD_DATA, TRANSLATIONS } from './constants';
 import { MarketCard } from './components/MarketCard';
 import { TradeModal } from './components/TradeModal';
 import { DepositModal } from './components/DepositModal';
 import { WithdrawModal } from './components/WithdrawModal';
-import { StakeModal } from './components/StakeModal';
 import { Button } from './components/Button';
 import { Logo } from './components/Logo';
-import { NewsFeed } from './components/NewsFeed';
 import { LegalFooter } from './components/LegalFooter';
 import { CryptoTicker } from './components/CryptoTicker';
 import { Sidebar } from './components/Sidebar';
 import { Snowfall } from './components/Snowfall';
-import { connectWallet, depositFunds, withdrawFunds, stakeFunds, requestUnstakeFunds, completeUnstakeFunds, buyShares, getPendingUnstake, getWalletUSDCBalance, Web3State } from './services/web3Service';
+import { 
+  connectWallet, 
+  depositFunds, 
+  withdrawFunds, 
+  buyShares, 
+  getWalletUSDCBalance, 
+  Web3State 
+} from './services/web3Service';
 
-const FarcasterIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="mr-2">
-    <path d="M15.8333 10.8333H4.16667V9.16667H15.8333V10.8333ZM15.8333 5.83333H4.16667V4.16667H15.8333V5.83333ZM10.8333 15.8333H4.16667V14.1667H10.8333V15.8333Z" fill="white"/>
-  </svg>
-);
-
-const SunIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-  </svg>
-);
-
-const MoonIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-  </svg>
-);
-
-const Header = ({ user, onLogin, onOpenDeposit, onOpenWithdraw, balance, points, isConnecting, isDarkMode, toggleTheme, lang, setLang }: any) => {
-  const t = TRANSLATIONS[lang as keyof typeof TRANSLATIONS];
-
+const LeaderboardPage = ({ lang }: { lang: Language }) => {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
   return (
-    <header className="border-b border-gray-200 dark:border-dark-700 bg-white/80 dark:bg-dark-900/80 backdrop-blur-md sticky top-0 z-40 transition-colors duration-300">
-      <div className="w-full px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link to="/" className="text-xl font-bold tracking-tight text-dark-900 dark:text-white flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Logo className="w-8 h-8" />
-            <span className="hidden sm:inline font-sans">BaseMarkets</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg transition-colors">
-            {isDarkMode ? <SunIcon /> : <MoonIcon />}
-          </button>
-
-          {user ? (
-            <div className="flex items-center gap-3">
-               <div className="flex items-center gap-2 bg-gray-100 dark:bg-dark-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-dark-700">
-                 <span className="text-sm font-mono font-bold text-base-500">${balance.toFixed(2)}</span>
-                 <Button size="sm" variant="primary" className="h-6 w-6 !p-0 rounded-full" onClick={onOpenDeposit}>+</Button>
-               </div>
-               <img src={user.pfpUrl} alt={user.username} className="w-8 h-8 rounded-full border-2 border-base-500" />
-            </div>
-          ) : (
-            <Button variant="farcaster" onClick={onLogin} disabled={isConnecting} size="sm">
-              {isConnecting ? t.connecting : <><FarcasterIcon /> {t.signIn}</>}
-            </Button>
-          )}
-        </div>
+    <div className="space-y-6 animate-fadeIn">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-black text-white">{t.leaderboard}</h1>
+        <p className="text-gray-400">Top predictors on the Base ecosystem.</p>
       </div>
-    </header>
+      <div className="bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden shadow-xl">
+        <table className="w-full text-left">
+          <thead className="bg-dark-900/50 border-b border-dark-700">
+            <tr>
+              <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Rank</th>
+              <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">User</th>
+              <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Profit (USDC)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-dark-700 font-bold">
+            {LEADERBOARD_DATA.map(row => (
+              <tr key={row.rank} className="hover:bg-white/5 transition-colors">
+                <td className="px-6 py-5 font-mono text-base-500">#{row.rank}</td>
+                <td className="px-6 py-5 text-white">{row.user}</td>
+                <td className="px-6 py-5 text-right font-mono text-green-500">+${row.pnl.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
 const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [lang, setLang] = useState<'en' | 'zh'>('en');
+  // Set default language to English
+  const [lang, setLang] = useState<Language>('en'); 
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [markets, setMarkets] = useState<Market[]>(INITIAL_MARKETS);
   const [balance, setBalance] = useState(0);
   const [web3State, setWeb3State] = useState<Web3State | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [stakedBalance, setStakedBalance] = useState(0);
-  const [pendingUnstake, setPendingUnstake] = useState({ amount: 0, unlockTime: 0 });
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [showStake, setShowStake] = useState(false);
   const [tradeModalData, setTradeModalData] = useState<{market: Market, outcome: MarketOutcome} | null>(null);
 
-  const t = TRANSLATIONS[lang];
-
-  useEffect(() => {
-    if (isDarkMode) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  }, [isDarkMode]);
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const handleLogin = async () => {
     setIsConnecting(true);
-    const state = await connectWallet();
-    if (state) {
-      setWeb3State(state);
-      setUser({ ...MOCK_USER, walletAddress: state.address });
-      const usdcBalance = await getWalletUSDCBalance(state.signer, state.address);
-      setBalance(usdcBalance);
+    try {
+      const state = await connectWallet();
+      if (state) {
+        setWeb3State(state);
+        setUser({ ...MOCK_USER, walletAddress: state.address });
+        const usdcBalance = await getWalletUSDCBalance(state.signer, state.address);
+        setBalance(usdcBalance);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsConnecting(false);
     }
-    setIsConnecting(false);
   };
 
-  const handleDeposit = async (amount: number, onStatus: (msg: string) => void) => {
+  const ensureLogin = async () => {
+    if (!web3State) {
+      await handleLogin();
+      return !!web3State;
+    }
+    return true;
+  };
+
+  const wrapDeposit = async (amount: number, onStatus: (msg: string) => void) => {
     if (!web3State) return;
     const success = await depositFunds(amount, web3State.signer, onStatus);
     if (success) {
-      const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
-      setBalance(usdcBalance); 
+      const b = await getWalletUSDCBalance(web3State.signer, web3State.address);
+      setBalance(b);
     }
   };
 
-  const handleTrade = async (marketId: string, outcome: MarketOutcome, amount: number, onStatus: (msg: string) => void) => {
+  const wrapWithdraw = async (amount: number) => {
+    if (!web3State) return;
+    const success = await withdrawFunds(amount, web3State.signer);
+    if (success) {
+      const b = await getWalletUSDCBalance(web3State.signer, web3State.address);
+      setBalance(b);
+    }
+  };
+
+  const wrapTrade = async (marketId: string, outcome: MarketOutcome, amount: number, onStatus: (msg: string) => void) => {
     if (!web3State) return;
     const success = await buyShares(marketId, outcome, amount, web3State.signer, onStatus);
     if (success) {
-        const usdcBalance = await getWalletUSDCBalance(web3State.signer, web3State.address);
-        setBalance(usdcBalance);
+      const b = await getWalletUSDCBalance(web3State.signer, web3State.address);
+      setBalance(b);
     }
   };
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-900 text-gray-900 dark:text-gray-100 flex flex-col font-sans transition-colors duration-300 relative">
+      <div className="min-h-screen bg-dark-900 text-white flex flex-col font-sans">
         <Snowfall />
         <CryptoTicker />
         
-        <Header 
-          user={user} onLogin={handleLogin} 
-          onOpenDeposit={() => setShowDeposit(true)}
-          onOpenWithdraw={() => setShowWithdraw(true)}
-          balance={balance} isConnecting={isConnecting}
-          isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)}
-          lang={lang} setLang={setLang}
-        />
+        <header className="border-b border-dark-700 bg-dark-900/80 backdrop-blur-md sticky top-0 z-40 h-16">
+          <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2 group">
+              <Logo className="w-8 h-8 group-hover:scale-110 transition-transform" />
+              <span className="font-black text-xl tracking-tighter">BASEMARKETS</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setLang(lang === 'en' ? 'vi' : 'en')} className="p-2 text-[10px] font-black bg-dark-800 rounded-lg border border-dark-600 uppercase">
+                {lang}
+              </button>
+              {user ? (
+                <div className="flex items-center gap-3 bg-dark-800 px-3 py-1.5 rounded-full border border-dark-700">
+                  <span className="text-xs font-black text-base-400 font-mono">${balance.toFixed(2)}</span>
+                  <button className="h-6 w-6 bg-base-500 hover:bg-base-600 text-white rounded-full flex items-center justify-center font-bold text-sm" onClick={() => setShowDeposit(true)}>+</button>
+                  <img src={user.pfpUrl} alt="User" className="w-6 h-6 rounded-full border border-white/20" />
+                </div>
+              ) : (
+                <Button variant="farcaster" onClick={handleLogin} disabled={isConnecting} size="sm" className="font-black">
+                  {isConnecting ? t.connecting : t.signIn}
+                </Button>
+              )}
+            </div>
+          </div>
+        </header>
 
         <div className="flex flex-1 max-w-7xl w-full mx-auto relative z-10">
-          <Sidebar onDeposit={() => setShowDeposit(true)} onWithdraw={() => setShowWithdraw(true)} lang={lang} />
-
-          <main className="flex-1 p-4 md:p-6 min-w-0 overflow-y-auto">
+          <Sidebar 
+            onDeposit={async () => (await ensureLogin()) && setShowDeposit(true)} 
+            onWithdraw={async () => (await ensureLogin()) && setShowWithdraw(true)} 
+            lang={lang} 
+          />
+          <main className="flex-1 p-4 md:p-8 min-w-0 overflow-y-auto">
             <Routes>
               <Route path="/" element={
-                <div className="space-y-8">
-                  {/* Hero Section Re-designed */}
-                  <div className="relative group rounded-3xl overflow-hidden bg-gradient-to-br from-base-600 via-base-900 to-black p-8 md:p-12 shadow-2xl border border-white/10">
+                <div className="space-y-12">
+                  <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-base-600 to-black p-8 md:p-14 border border-white/10 shadow-2xl">
                     <div className="relative z-20 max-w-xl">
-                      <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-bold text-base-100 mb-6 border border-white/20 animate-pulse">
-                        LIVE ON BASE NETWORK
-                      </div>
-                      <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight text-white tracking-tight drop-shadow-lg">
-                        {t.heroTitle}
-                      </h1>
-                      <p className="text-base-100/80 text-lg mb-8 leading-relaxed font-medium">
-                        {t.heroDesc}
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-4">
-                        <Button 
-                          variant="primary" 
-                          size="lg"
-                          className="!bg-white !text-base-600 hover:!bg-base-50 !border-none !rounded-2xl px-10 py-4 text-lg font-black shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95"
-                        >
-                          {t.startTrading}
-                        </Button>
-                        <div className="flex -space-x-3 items-center">
-                          {[1,2,3,4].map(i => (
-                            <img key={i} src={`https://picsum.photos/32/32?random=${i+10}`} className="w-10 h-10 rounded-full border-2 border-base-900 shadow-lg" alt="User" />
-                          ))}
-                          <span className="ml-4 text-sm font-bold text-white/60">+12.4k trading</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Background Visuals - Non-Earth focused */}
-                    <div className="absolute top-0 right-0 w-full h-full pointer-events-none opacity-40">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-base-500/20 rounded-full blur-[120px] animate-blob"></div>
-                      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-base-500/10 to-transparent"></div>
-                      <div className="absolute right-12 top-12 flex flex-col gap-4">
-                        {[1,2,3].map(i => (
-                          <div key={i} className="w-48 h-12 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}></div>
-                        ))}
-                      </div>
+                      <h1 className="text-4xl md:text-6xl font-black mb-6 leading-[1.1] tracking-tight">{t.heroTitle}</h1>
+                      <p className="text-white/70 text-lg mb-10 font-medium">{t.heroDesc}</p>
+                      <Button variant="primary" size="lg" className="!bg-white !text-base-600 font-black px-12 shadow-2xl hover:scale-105 transition-transform">{t.startTrading}</Button>
                     </div>
                   </div>
-
-                  {/* Market Grid */}
                   <div>
-                    <div className="flex justify-between items-end mb-6">
-                       <div>
-                         <h2 className="text-2xl font-black text-gray-900 dark:text-white">{t.trendingMarkets}</h2>
-                         <p className="text-sm text-gray-500">Real-time sentiment from Farcaster users</p>
-                       </div>
-                       <Link to="/markets" className="text-sm font-bold text-base-500 hover:underline">View All →</Link>
-                    </div>
+                    <h2 className="text-2xl font-black text-white mb-8 flex items-center gap-3">
+                      <span className="w-1.5 h-8 bg-base-500 rounded-full"></span>
+                      {t.trendingMarkets}
+                    </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {markets.map(market => (
-                        <MarketCard 
-                          key={market.id} market={market} 
-                          onTrade={(m, o) => setTradeModalData({ market: m, outcome: o })}
-                          lang={lang}
-                        />
+                      {INITIAL_MARKETS.map(market => (
+                        <MarketCard key={market.id} market={market} onTrade={(m, o) => setTradeModalData({ market: m, outcome: o })} lang={lang} />
                       ))}
                     </div>
                   </div>
                 </div>
               } />
-              
-              <Route path="/leaderboard" element={<div className="p-12 text-center text-gray-500">Leaderboard Loading...</div>} />
-              <Route path="/earn" element={<div className="p-12 text-center text-gray-500">Earn Module Loading...</div>} />
+              <Route path="/leaderboard" element={<LeaderboardPage lang={lang} />} />
+              <Route path="/portfolio" element={<div className="p-12 text-center text-gray-500 font-bold italic">Portfolio coming soon...</div>} />
             </Routes>
           </main>
         </div>
-
         <LegalFooter />
 
-        <TradeModal 
-          isOpen={!!tradeModalData}
-          onClose={() => setTradeModalData(null)}
-          market={tradeModalData?.market || null}
-          initialOutcome={tradeModalData?.outcome || MarketOutcome.YES}
-          onTrade={handleTrade}
-          userBalance={balance}
-        />
-        
-        <DepositModal 
-          isOpen={showDeposit} 
-          onClose={() => setShowDeposit(false)} 
-          onDeposit={handleDeposit} 
-          currentBalance={balance} 
-        />
+        <TradeModal isOpen={!!tradeModalData} onClose={() => setTradeModalData(null)} market={tradeModalData?.market || null} initialOutcome={tradeModalData?.outcome || MarketOutcome.YES} onTrade={wrapTrade} userBalance={balance} />
+        <DepositModal isOpen={showDeposit} onClose={() => setShowDeposit(false)} onDeposit={wrapDeposit} currentBalance={balance} />
+        <WithdrawModal isOpen={showWithdraw} onClose={() => setShowWithdraw(false)} onWithdraw={wrapWithdraw} currentBalance={balance} />
       </div>
     </Router>
   );
