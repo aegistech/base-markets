@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BaseMarkets</title>
+    <title>BaseMarkets | Predict & Earn</title>
     
     <!-- Farcaster Frame v2 Metadata -->
     <meta property="fc:frame" content='{"version":"next","imageUrl":"https://base-markets.vercel.app/og-image.png","button":{"title":"Launch App","action":{"type":"launch_app","name":"BaseMarkets","url":"https://base-markets.vercel.app/","splashImageUrl":"https://base-markets.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
@@ -11,24 +11,28 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230052ff' /%3E%3Cpath d='M25 65 L 45 45 L 55 55 L 75 30' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     
     <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@^19.2.3",
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "react/": "https://esm.sh/react@^19.2.3/",
-        "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-        "react-router-dom": "https://esm.sh/react-router-dom@^7.10.1",
-        "ethers": "https://esm.sh/ethers@^6.16.0",
-        "vite": "https://esm.sh/vite@^7.3.0",
-        "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
-      }
-    }
-    </script>
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@6.28.0",
+    "ethers": "https://esm.sh/ethers@6.13.2",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+    <style>
+      body { margin: 0; background: #0f1115; font-family: sans-serif; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Farcaster SDK is loaded dynamically in App.tsx if needed, or via CDN here -->
     <script src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk/dist/index.min.js"></script>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
